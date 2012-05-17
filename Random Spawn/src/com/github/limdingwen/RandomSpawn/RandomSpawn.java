@@ -29,10 +29,7 @@ public class RandomSpawn extends JavaPlugin {
 	
 	public Permission perms = null;
 	
-	public Map<String,String> worlds = new HashMap<String, String>();
-	public Map<String,Double> locationsx = new HashMap<String, Double>();
-	public Map<String,Double> locationsy = new HashMap<String, Double>();
-	public Map<String,Double> locationsz = new HashMap<String, Double>();
+	public Map<String,Spawn> spawns = new HashMap<String, Spawn>();
 	
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
@@ -113,79 +110,24 @@ public class RandomSpawn extends JavaPlugin {
 				}
 			}
 			
-			// Save worlds
+			// Save spawns
 			
 			try {
-				worlds = (Map) SLAPI.load("Worlds");
+				spawns = (Map) SLAPI.load("plugins.RandomSpawn.Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("Worlds file not detected. Creating file.");
+				log.info("Saves file not detected. Creating file.");
 			}
-			worlds.put(id, world.getName());
+			spawns.put(id, new Spawn(world, spawnLoc));
 			
 			try {
-				SLAPI.save(worlds, "Worlds");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			// Save locations
-			// x
-			
-			try {
-				locationsx = (Map) SLAPI.load("Locationsx");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				log.info("Locationsx file not detected. Creating file.");
-			}
-			locationsx.put(id, spawnLoc.getX());
-			
-			try {
-				SLAPI.save(locationsx, "Locationsx");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			// y
-			
-			try {
-				locationsy = (Map) SLAPI.load("Locationsy");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				log.info("Locationsy file not detected. Creating file.");
-			}
-			locationsy.put(id, spawnLoc.getY());
-			
-			try {
-				SLAPI.save(locationsy, "Locationsy");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			// z
-			
-			try {
-				locationsz = (Map) SLAPI.load("Locationsz");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				log.info("Locationsz file not detected. Creating file.");
-			}
-			locationsz.put(id, spawnLoc.getZ());
-			
-			try {
-				SLAPI.save(locationsz, "Locationsz");
+				SLAPI.save(spawns, "plugins.RandomSpawn.Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 									
 			return true;
-		}
-		else if (command.getName().equalsIgnoreCase("listrspawns")) {
-			 
 		}
 		
 		return false;
