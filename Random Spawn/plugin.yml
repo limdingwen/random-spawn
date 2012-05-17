@@ -1,0 +1,20 @@
+name: RandomSpawn
+main: com.github.limdingwen.RandomSpawn.RandomSpawn
+version: 0.3
+description: This plugin allows you to set multiple spawn points and spawn at random locations. You can also set to go to the spawn when you die and HAVE a bed registered, and while joining again.
+load: STARTUP
+author: limdingwen
+website: http://dev.bukkit.org/server-mods/random-spawns
+softdepend: [Vault]
+
+commands:
+       setRSpawn:
+          description: Sets a spawn. If you do not provide XYZ coordinates, your location is used. The ID can be a string. If it is used in console the world must be specified.
+          usage: /setRSpawn <ID> [X] [Y] [Z]
+          permission: RandomSpawn.manage.setSpawn
+          permission-message: You don't have permission.
+       listRSpawns:
+          description: Lists the ID and World of existing spawns.
+          usage: /listRSpawns
+          permission: RandomSpawn.info.list
+          permission-message: You don't have permission.
