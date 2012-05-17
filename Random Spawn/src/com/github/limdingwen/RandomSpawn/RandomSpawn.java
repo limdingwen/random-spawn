@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -175,6 +176,88 @@ public class RandomSpawn extends JavaPlugin {
 			for (int i = 0; i < klist.size(); i++) {
 				sender.sendMessage(klist.get(i) + " (" + vlist.get(i).world + ")");
 			}
+			
+			return true;
+		}
+		else if (command.getName().equalsIgnoreCase("checkRSpawn")) {
+			// Load
+			
+			if (args.length != 1) {
+				sender.sendMessage("Incorrect usuage. Use /checkRSpawn <id>. Spawn not checked.");
+				
+				return true;
+			}
+			
+			try {
+				spawns = (Map) SLAPI.load("Spawns");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				log.info("There is no file!");
+				sender.sendMessage("No spawn data detected. Aborting.");
+				
+				return true;
+			}
+						
+			sender.sendMessage("Info about " + args[0] + ":");
+			sender.sendMessage("World: " + spawns.get(args[0]).world);
+			sender.sendMessage("Location: X:" + spawns.get(args[0]).x + " Y:" + spawns.get(args[0]).y + " Z:" + spawns.get(args[0]).z);
+			
+			return true;
+		}
+		else if (command.getName().equalsIgnoreCase("spawn")) {
+			// Load
+			
+			Player player;
+			
+			if (sender instanceof Player) {
+				player = (Player) sender;
+			}
+			else {
+				sender.sendMessage("This can only be run in a client!");
+				
+				return true;
+			}
+			
+			String id = null;
+			
+			if (args.length == 0) {
+				id = null;
+			}
+			else if (args.length == 1) {
+				id = args[0];
+			}
+			
+			try {
+				spawns = (Map) SLAPI.load("Spawns");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				log.info("There is no file!");
+				sender.sendMessage("No spawn data detected. Aborting.");
+				
+				return true;
+			}
+						
+			if (id == null) {
+				ArrayList<Spawn> vlist = new ArrayList<Spawn>(spawns.values());
+				
+				int randomNumber = (int) Math.ceil(Math.random() * vlist.size());
+				
+				player.teleport(new Location(Bukkit.getServer().getWorld(vlist.get(randomNumber).world), vlist.get(randomNumber).x, vlist.get(randomNumber).y, vlist.get(randomNumber).z));
+			}
+			else {				
+				player.teleport(new Location(Bukkit.getServer().getWorld(spawns.get(id).world), spawns.get(id).x, spawns.get(id).y, spawns.get(id).z));
+			}
+			
+			sender.sendMessage("Woosh!");
+			
+			if (id != null) {
+				log.info(player.getName() + " teleported to " + id + ".");
+			}
+			else {
+				log.info(player.getName() + " teleported to a random spawn.");
+			}
+			
+			return true;
 		}
 		
 		return false;

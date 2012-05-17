@@ -1,6 +1,6 @@
 name: RandomSpawn
 main: com.github.limdingwen.RandomSpawn.RandomSpawn
-version: 0.5
+version: 0.7
 description: This plugin allows you to set multiple spawn points and spawn at random locations. You can also set to go to the spawn when you die and HAVE a bed registered, and while joining again.
 load: STARTUP
 author: limdingwen
@@ -13,8 +13,22 @@ commands:
           usage: /setRSpawn <ID> [X] [Y] [Z]
           permission: RandomSpawn.manage.setSpawn
           permission-message: You don't have permission.
+          aliases: [srs]
        listRSpawns:
           description: Lists the ID and World of existing spawns.
           usage: /listRSpawns
           permission: RandomSpawn.info.list
           permission-message: You don't have permission.
+          aliases: [lrs]
+       checkRSpawn:
+          description: Tells you all about a specific spawn.
+          usage: /checkRSpawn <ID>
+          permission: RandomSpawn.info.check
+          permission-message: You don't have permission.
+          aliases: [crs]
+       spawn:
+          description: Teleports you to a spawn. If no ID is specified, it will be random.
+          usage: /spawn [ID]
+          permission: RandomSpawn.spawn
+          permission-message: You don't have permission.
+          aliases: [spa]
