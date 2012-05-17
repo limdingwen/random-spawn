@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 public class Spawn implements Serializable {
@@ -13,21 +12,43 @@ public class Spawn implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public Spawn(World world, Vector location) {
+	public Spawn(String world, Double x, Double y, Double z) {
 		super();
 		this.world = world;
-		this.location = location;
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
-	World world;
+
+	String world;
 	Vector location;
-	public World getWorld() {
+	Double x;
+	Double y;
+	Double z;
+	public String getWorld() {
 		return world;
 	}
-	public void setWorld(World world) {
+	public void setWorld(String world) {
 		this.world = world;
 	}
-	public Vector getLocation() {
-		return location;
+	
+	public Double getX() {
+		return x;
+	}
+	public void setX(Double x) {
+		this.x = x;
+	}
+	public Double getY() {
+		return y;
+	}
+	public void setY(Double y) {
+		this.y = y;
+	}
+	public Double getZ() {
+		return z;
+	}
+	public void setZ(Double z) {
+		this.z = z;
 	}
 	public void setLocation(Vector location) {
 		this.location = location;
