@@ -170,11 +170,16 @@ public class RandomSpawn extends JavaPlugin {
 			
 			ArrayList<Spawn> vlist = new ArrayList<Spawn>(spawns.values());
 			ArrayList<String> klist = new ArrayList<String>(spawns.keySet());
-			
-			sender.sendMessage("Existing spawns:");
-			
-			for (int i = 0; i < klist.size(); i++) {
-				sender.sendMessage(klist.get(i) + " (" + vlist.get(i).world + ")");
+						
+			if (klist.size() != 0) {
+				sender.sendMessage("Existing spawns:");
+				
+				for (int i = 0; i < klist.size(); i++) {
+					sender.sendMessage(klist.get(i) + " (" + vlist.get(i).world + ")");
+				}
+			}
+			else {
+				sender.sendMessage("There are currently no existing spawns.")
 			}
 			
 			return true;
@@ -197,11 +202,18 @@ public class RandomSpawn extends JavaPlugin {
 				
 				return true;
 			}
-						
-			sender.sendMessage("Info about " + args[0] + ":");
-			sender.sendMessage("World: " + spawns.get(args[0]).world);
-			sender.sendMessage("Location: X:" + spawns.get(args[0]).x + " Y:" + spawns.get(args[0]).y + " Z:" + spawns.get(args[0]).z);
 			
+			if (spawns.containsKey(args[0])) {
+				sender.sendMessage("Info about " + args[0] + ":");
+				sender.sendMessage("World: " + spawns.get(args[0]).world);
+				sender.sendMessage("Location: X:" + spawns.get(args[0]).x + " Y:" + spawns.get(args[0]).y + " Z:" + spawns.get(args[0]).z);
+			}
+			else {
+				sender.sendMessage("Sorry, I cannot find that spawn to check the info.");
+				
+				return true;
+			}
+				
 			return true;
 		}
 		else if (command.getName().equalsIgnoreCase("spawn")) {
@@ -244,8 +256,15 @@ public class RandomSpawn extends JavaPlugin {
 				
 				player.teleport(new Location(Bukkit.getServer().getWorld(vlist.get(randomNumber).world), vlist.get(randomNumber).x, vlist.get(randomNumber).y, vlist.get(randomNumber).z));
 			}
-			else {				
-				player.teleport(new Location(Bukkit.getServer().getWorld(spawns.get(id).world), spawns.get(id).x, spawns.get(id).y, spawns.get(id).z));
+			else {
+				if (spawns.containsKey(id)) {
+					player.teleport(new Location(Bukkit.getServer().getWorld(spawns.get(id).world), spawns.get(id).x, spawns.get(id).y, spawns.get(id).z));
+				}
+				else {
+					sender.sendMessage("Sorry, there is no spawn with the id " + id + ".");
+					
+					return true;
+				}
 			}
 			
 			sender.sendMessage("Woosh!");
@@ -259,11 +278,51 @@ public class RandomSpawn extends JavaPlugin {
 			
 			return true;
 		}
+		else if (command.getName().equalsIgnoreCase("removerspawn")) {
+			// Load
+			
+			if (args.length != 1) {
+				sender.sendMessage("Incorrect usuage. Use /removeRSpawn <id>. Spawn not removed.");
+				
+				return true;
+			}
+			
+			try {
+				spawns = (Map) SLAPI.load("Spawns");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				log.info("There is no file!");
+				sender.sendMessage("No spawn data detected. Aborting.");
+				
+				return true;
+			}
+			
+			if (spawns.containsKey(args[0])) {
+				spawns.remove(args[0]);
+				
+				try {
+					SLAPI.save(spawns, "Spawns");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					sender.sendMessage("Failed to delete spawn as an error occured in saving the file.");
+					e.printStackTrace();
+				}
+				
+				sender.sendMessage("Sucess! Spawn " + args[0] + " was removed from the database.");
+			}
+			else {
+				sender.sendMessage("Sorry, I cannot find that spawn to remove.");
+				
+				return true;
+			}
+				
+			return true;
+		}
 		
 		return false;
 	}
 	
 	public void onDisable() {
-		log.info("RandomSpawn disabled.");
+		log.info("RandomSpawn disabled safely.");
 	}
 }

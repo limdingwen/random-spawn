@@ -1,11 +1,11 @@
 name: RandomSpawn
 main: com.github.limdingwen.RandomSpawn.RandomSpawn
-version: 0.7.1
+version: 0.8
 description: This plugin allows you to set multiple spawn points and spawn at random locations. You can also set to go to the spawn when you die and HAVE a bed registered, and while joining again.
 load: STARTUP
 author: limdingwen
 website: http://dev.bukkit.org/server-mods/random-spawns
-softdepend: [Vault]
+depend: [Vault]
 
 commands:
        setRSpawn:
@@ -32,3 +32,9 @@ commands:
           permission: RandomSpawn.spawn
           permission-message: You don't have permission.
           aliases: [spa]
+       removerspawn:
+          description: Removes a spawn with the specific ID. Be careful! Once you remove, it will be gone forever!
+          usage: /removerspawn <ID>
+          permission: RandomSpawn.remove
+          permission-message: You don't have permission.
+          aliases: [rrs]
