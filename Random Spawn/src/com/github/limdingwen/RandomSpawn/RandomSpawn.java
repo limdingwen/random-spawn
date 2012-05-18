@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -19,13 +21,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import com.avaje.ebeaninternal.server.persist.BindValues.Value;
 
-public class RandomSpawn extends JavaPlugin {
+public class RandomSpawn extends JavaPlugin implements Listener {
 	Logger log;
 	World world;
 	Vector spawnLoc;
@@ -38,17 +42,19 @@ public class RandomSpawn extends JavaPlugin {
 	
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
-	
+    
 	public void onEnable() {
 		log = this.getLogger();
 		
 		if (!setupPermissions()) {
 			getServer().getPluginManager().disablePlugin(this);
-			log.info("RandomSpawn requires Vault & permissions! Plugin disabled to prevent glitches. Download Vault: http://dev.bukkit.org/server-mods/vault");
+			log.warning("RandomSpawn requires Vault & permissions! Plugin disabled to prevent glitches. Download Vault: http://dev.bukkit.org/server-mods/vault");
 			return;
 		}
+		
+		getServer().getPluginManager().registerEvents(this, this);
 	
-		log.info("RandomSpawn ready for random spawning!");
+		log.info("RandomSpawn ready for random spawning! Made by limdingwen, idea by vasil7112.");
 	}
 	
 	private boolean setupPermissions() {
@@ -121,7 +127,7 @@ public class RandomSpawn extends JavaPlugin {
 				spawns = (Map) SLAPI.load("Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("Saves file not detected. Creating file.");
+				log.warning("Saves file not detected. Creating file.");
 			}
 			spawns.put(id, new Spawn(world.getName(), spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ()));
 			
@@ -139,7 +145,7 @@ public class RandomSpawn extends JavaPlugin {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				log.info("Oh no! Something went wrong. We cannot find the file. Post a ticket. Aborting.");
+				log.warning("Oh no! Something went wrong. We cannot find the file. Post a ticket. Aborting.");
 				
 				return true;
 			}
@@ -162,7 +168,7 @@ public class RandomSpawn extends JavaPlugin {
 				spawns = (Map) SLAPI.load("Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("There is no file!");
+				log.warning("There is no file!");
 				sender.sendMessage("No spawns detected. Aborting.");
 				
 				return true;
@@ -179,7 +185,7 @@ public class RandomSpawn extends JavaPlugin {
 				}
 			}
 			else {
-				sender.sendMessage("There are currently no existing spawns.")
+				sender.sendMessage("There are currently no existing spawns.");
 			}
 			
 			return true;
@@ -197,7 +203,7 @@ public class RandomSpawn extends JavaPlugin {
 				spawns = (Map) SLAPI.load("Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("There is no file!");
+				log.warning("There is no file!");
 				sender.sendMessage("No spawn data detected. Aborting.");
 				
 				return true;
@@ -243,28 +249,35 @@ public class RandomSpawn extends JavaPlugin {
 				spawns = (Map) SLAPI.load("Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("There is no file!");
+				log.warning("There is no file!");
 				sender.sendMessage("No spawn data detected. Aborting.");
 				
 				return true;
 			}
-						
-			if (id == null) {
-				ArrayList<Spawn> vlist = new ArrayList<Spawn>(spawns.values());
-				
-				int randomNumber = (int) Math.floor(Math.random() * vlist.size());
-				
-				player.teleport(new Location(Bukkit.getServer().getWorld(vlist.get(randomNumber).world), vlist.get(randomNumber).x, vlist.get(randomNumber).y, vlist.get(randomNumber).z));
-			}
-			else {
-				if (spawns.containsKey(id)) {
-					player.teleport(new Location(Bukkit.getServer().getWorld(spawns.get(id).world), spawns.get(id).x, spawns.get(id).y, spawns.get(id).z));
+			
+			if (spawns.size() > 0) {
+				if (id == null) {
+					ArrayList<Spawn> vlist = new ArrayList<Spawn>(spawns.values());
+					
+					int randomNumber = (int) Math.floor(Math.random() * vlist.size());
+					
+					player.teleport(new Location(Bukkit.getServer().getWorld(vlist.get(randomNumber).world), vlist.get(randomNumber).x, vlist.get(randomNumber).y, vlist.get(randomNumber).z));
 				}
 				else {
-					sender.sendMessage("Sorry, there is no spawn with the id " + id + ".");
-					
-					return true;
+					if (spawns.containsKey(id)) {
+						player.teleport(new Location(Bukkit.getServer().getWorld(spawns.get(id).world), spawns.get(id).x, spawns.get(id).y, spawns.get(id).z));
+					}
+					else {
+						sender.sendMessage("Sorry, there is no spawn with the id " + id + ".");
+						
+						return true;
+					}
 				}
+			}
+			else {
+				sender.sendMessage("There is no spawn data! Aborted as it is impossible to teleport without spawn data.");
+				
+				return true;
 			}
 			
 			sender.sendMessage("Woosh!");
@@ -291,7 +304,7 @@ public class RandomSpawn extends JavaPlugin {
 				spawns = (Map) SLAPI.load("Spawns");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("There is no file!");
+				log.warning("There is no file!");
 				sender.sendMessage("No spawn data detected. Aborting.");
 				
 				return true;
@@ -322,7 +335,51 @@ public class RandomSpawn extends JavaPlugin {
 		return false;
 	}
 	
+	@EventHandler
+	public void PlayerJoinEvent(PlayerJoinEvent event) {
+		LoginRespawnSharing(event.getPlayer());
+	}
+	
+	public void LoginRespawnSharing(final Player sharedPlayer) {
+		int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				try {
+					spawns = (Map) SLAPI.load("Spawns");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					log.warning("There is no spawn file detected, so " + sharedPlayer.getName() + " is not affected by RandomSpawn. Stacktrace:");
+					e.printStackTrace();
+					sharedPlayer.sendMessage("Sorry, due to an internal server error RandomSpawn cannot work properly, and you are now using the default spawning system. Please contact the server admins for more details.");
+					
+					return;
+					
+				}
+				
+				if (spawns.size() > 0) {
+					ArrayList<Spawn> vlist = new ArrayList<Spawn>(spawns.values());
+					
+					int randomNumber = (int) Math.floor(Math.random() * vlist.size());
+					sharedPlayer.teleport(new Location(Bukkit.getServer().getWorld(vlist.get(randomNumber).world), vlist.get(randomNumber).x, vlist.get(randomNumber).y, vlist.get(randomNumber).z));
+				}
+				else {
+					log.warning("No data found in spawn file, player not teleported.");
+					sharedPlayer.sendMessage("Sorry, due to an internal server error RandomSpawn cannot work properly, and you are now using the default spawning system. Please contact the server admins for more details.");
+				}
+				
+				log.info("Sucessfully sent " + sharedPlayer.getName() + " to a spawn point.");
+				sharedPlayer.sendMessage("You have spawned randomly by Random Spawn.");
+			}
+		}, 10L);
+	}
+	
+	@EventHandler
+	public void PlayerRespawnEvent(PlayerRespawnEvent event) {
+		LoginRespawnSharing(event.getPlayer());
+	}
+	
 	public void onDisable() {
+		
 		log.info("RandomSpawn disabled safely.");
 	}
 }

@@ -1,6 +1,6 @@
 name: RandomSpawn
 main: com.github.limdingwen.RandomSpawn.RandomSpawn
-version: 0.8
+version: 1.0
 description: This plugin allows you to set multiple spawn points and spawn at random locations. You can also set to go to the spawn when you die and HAVE a bed registered, and while joining again.
 load: STARTUP
 author: limdingwen
