@@ -240,7 +240,7 @@ public class RandomSpawn extends JavaPlugin {
 			if (id == null) {
 				ArrayList<Spawn> vlist = new ArrayList<Spawn>(spawns.values());
 				
-				int randomNumber = (int) Math.ceil(Math.random() * vlist.size());
+				int randomNumber = (int) Math.floor(Math.random() * vlist.size());
 				
 				player.teleport(new Location(Bukkit.getServer().getWorld(vlist.get(randomNumber).world), vlist.get(randomNumber).x, vlist.get(randomNumber).y, vlist.get(randomNumber).z));
 			}
